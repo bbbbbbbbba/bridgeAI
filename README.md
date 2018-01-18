@@ -1,2 +1,3 @@
-# bridgeAI
-experimenting with AIs for the game of contract bridge
+Trying to build a bridge AI with TensorFlow.
+
+Current goal: learn double-dummy evaluation of game positions.
