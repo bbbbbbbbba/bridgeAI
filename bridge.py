@@ -21,6 +21,7 @@ class BridgePosition:
         self.currentSuit = None
         self.currentHigh = None
         self.currentHighPlayer = None
+        self.score = 0 # Number of tricks won by players 0 and 2
 
     def getMoves(self):
         if self.cardsInTrick == 0 or self.hands[self.currentPlayer][self.currentSuit] == []: suits = range(4)
@@ -39,6 +40,7 @@ class BridgePosition:
             self.currentHigh = rank
             self.currentHighPlayer = self.currentPlayer
         if self.cardsInTrick == 3:
+            if self.currentHighPlayer % 2 == 0: self.score += 1
             trickWon = (self.currentPlayer - self.currentHighPlayer) % 2 == 0
             self.currentPlayer = self.currentHighPlayer
             self.cardsInTrick = 0
