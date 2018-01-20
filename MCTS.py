@@ -21,16 +21,17 @@ def MCTS_iteration(root):
         path.append(path[-1][-1][move_max])
 
     # expand and evaluate
-    pos = path[-1][0]
+    if path[-1][0] is None:
+        pos = deepcopy(path[-2][0])
+        pos.make_move(move_max)
+        path[-1][0] = pos
+    else:
+        pos = path[-1][0]
     moves = pos.get_moves()
     v, p = evaluate(pos, moves)
     if len(moves) > 0:
         children = {}
-        for move in moves:
-            y = deepcopy(pos)
-            y.make_move(move)
-            children[move] = [y, 0, 0.0, v, p[move], None]
-
+        for move in moves: children[move] = [None, 0, 0.0, v, p[move], None]
         path[-1][-1] = children
 
     # backup
@@ -46,10 +47,10 @@ def evaluate(pos, moves):
     tricks_left = sum(len(x) for x in pos.hands[pos.current_player])
     return (pos.score + tricks_left / 2, {move: 1 / len(moves) for move in moves})
 
-def visualize_tree(root, depth = 0, move = None):
-    card_str = '**' if move is None else root[0].move_to_str(move)
+def visualize_tree(root, depth = 0, move = None, parent = None):
+    card_str = '**' if move is None else parent.move_to_str(move)
     print('%s%s %d %f %f' % ('    ' * depth, card_str, root[1], root[3], root[4]))
     if root[-1] is not None:
         moves = list(root[-1].keys())
         moves.sort(key = lambda move: root[-1][move][1], reverse = True)
-        for move in moves: visualize_tree(root[-1][move], depth + 1, move)
+        for move in moves: visualize_tree(root[-1][move], depth + 1, move, root[0])
