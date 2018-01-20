@@ -12,7 +12,7 @@ def MCTS_iteration(root):
     while path[-1][-1] is not None:
         a_max = None
         c = C_PUCT * (path[-1][1] - 1) ** 0.5
-        mult = 1 if path[-1][0].currentPlayer % 2 == 0 else -1
+        mult = 1 if path[-1][0].current_player % 2 == 0 else -1
         for move, node in path[-1][-1].items():
             a = node[3] * mult + c * node[4] / (1 + node[1])
             if a_max is None or a > a_max:
@@ -22,13 +22,13 @@ def MCTS_iteration(root):
 
     # expand and evaluate
     pos = path[-1][0]
-    moves = pos.getMoves()
+    moves = pos.get_moves()
     v, p = evaluate(pos, moves)
     if len(moves) > 0:
         children = {}
         for move in moves:
             y = deepcopy(pos)
-            y.makeMove(move)
+            y.make_move(move)
             children[move] = [y, 0, 0.0, v, p[move], None]
 
         path[-1][-1] = children
@@ -43,7 +43,7 @@ def evaluate(pos, moves):
     # TODO
     # should always output estimated score for players 0 and 2,
     # even though DNN always see the situation from the perspective of the current player
-    tricks_left = sum(len(x) for x in pos.hands[pos.currentPlayer])
+    tricks_left = sum(len(x) for x in pos.hands[pos.current_player])
     return (pos.score + tricks_left / 2, {move: 1 / len(moves) for move in moves})
 
 def visualize_tree(root, depth = 0, move = None):

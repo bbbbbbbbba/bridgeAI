@@ -22,41 +22,41 @@ class BridgePosition:
                 self.hands.append(hand)
         else:
             self.hands = hands
-        self.currentPlayer = 0
-        self.cardsInTrick = 0
-        self.currentSuit = None
-        self.currentHigh = None
-        self.currentHighPlayer = None
+        self.current_player = 0
+        self.cards_in_trick = 0
+        self.current_suit = None
+        self.current_high = None
+        self.current_high_player = None
         self.score = 0 # Number of tricks won by players 0 and 2
         self.move_to_str = move_to_str
 
-    def getMoves(self):
-        if self.cardsInTrick == 0 or self.hands[self.currentPlayer][self.currentSuit] == []: suits = range(4)
-        else: suits = [self.currentSuit]
+    def get_moves(self):
+        if self.cards_in_trick == 0 or self.hands[self.current_player][self.current_suit] == []: suits = range(4)
+        else: suits = [self.current_suit]
         res = []
         for suit in suits:
-            for rank in self.hands[self.currentPlayer][suit]:
+            for rank in self.hands[self.current_player][suit]:
                 res.append((suit, rank))
         return res
 
-    def makeMove(self, move):
+    def make_move(self, move):
         suit, rank = move
-        self.hands[self.currentPlayer][suit].remove(rank)
-        if self.cardsInTrick == 0: self.currentSuit = suit
-        if self.cardsInTrick == 0 or suit == self.currentSuit and rank > self.currentHigh:
-            self.currentHigh = rank
-            self.currentHighPlayer = self.currentPlayer
-        if self.cardsInTrick == 3:
-            if self.currentHighPlayer % 2 == 0: self.score += 1
-            trickWon = (self.currentPlayer - self.currentHighPlayer) % 2 == 0
-            self.currentPlayer = self.currentHighPlayer
-            self.cardsInTrick = 0
-            self.currentSuit = None
-            self.currentHigh = None
-            self.currentHighPlayer = None
-            return trickWon
-        self.currentPlayer = (self.currentPlayer + 1) % 4
-        self.cardsInTrick += 1
+        self.hands[self.current_player][suit].remove(rank)
+        if self.cards_in_trick == 0: self.current_suit = suit
+        if self.cards_in_trick == 0 or suit == self.current_suit and rank > self.current_high:
+            self.current_high = rank
+            self.current_high_player = self.current_player
+        if self.cards_in_trick == 3:
+            if self.current_high_player % 2 == 0: self.score += 1
+            trick_won = (self.current_player - self.current_high_player) % 2 == 0
+            self.current_player = self.current_high_player
+            self.cards_in_trick = 0
+            self.current_suit = None
+            self.current_high = None
+            self.current_high_player = None
+            return trick_won
+        self.current_player = (self.current_player + 1) % 4
+        self.cards_in_trick += 1
         return False
 
     def visualize(self):
@@ -67,15 +67,15 @@ class BridgePosition:
         for suit in range(4): print('        '  + hand_strs[3][suit])
 
     # Converts the position to a tensor for use with TensorFlow (currently a vector)
-    def toTensor(self):
+    def to_tensor(self):
         res = []
         for i in range(4):
-            hand = self.hands[(self.currentPlayer + i) % 4]
+            hand = self.hands[(self.current_player + i) % 4]
             for suit in range(4):
                 for rank in range(2, 15):
                     res.append(1 if rank in hand[suit] else 0)
-        for i in range(4): res.append(1 if self.cardsInTrick == i else 0)
-        for suit in range(4): res.append(1 if self.currentSuit == suit else 0)
-        for rank in range(2, 15): res.append(1 if self.currentHigh == rank else 0)
-        for i in range(1, 4): res.append(1 if self.currentHighPlayer == (self.currentPlayer + i) % 4 else 0)
+        for i in range(4): res.append(1 if self.cards_in_trick == i else 0)
+        for suit in range(4): res.append(1 if self.current_suit == suit else 0)
+        for rank in range(2, 15): res.append(1 if self.current_high == rank else 0)
+        for i in range(1, 4): res.append(1 if self.current_high_player == (self.current_player + i) % 4 else 0)
         return res
