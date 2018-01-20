@@ -47,7 +47,7 @@ def evaluate(pos, moves):
     return (pos.score + tricks_left / 2, {move: 1 / len(moves) for move in moves})
 
 def visualize_tree(root, depth = 0, move = None):
-    card_str = '**' if move is None else '%s%s' % ('SHDC'[move[0]], '  23456789TJQKA'[move[1]])
+    card_str = '**' if move is None else root[0].move_to_str(move)
     print('%s%s %d %f %f' % ('    ' * depth, card_str, root[1], root[3], root[4]))
     if root[-1] is not None:
         moves = list(root[-1].keys())
