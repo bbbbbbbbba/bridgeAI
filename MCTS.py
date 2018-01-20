@@ -1,7 +1,6 @@
 from copy import deepcopy
 import random
 
-MCTS_K = 100
 C_PUCT = 1.0
 
 def init_tree(pos):
