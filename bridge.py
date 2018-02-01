@@ -6,6 +6,9 @@ rank_str = '  23456789TJQKA'
 def move_to_str(move):
     return '%s%s' % (suit_str[move[0]], rank_str[move[1]])
 
+def move_to_int(move):
+    return move[0] * 13 + move[1] - 2
+
 # TODO: trump contract
 class BridgePosition:
     def __init__(self, hands = None):
@@ -29,6 +32,7 @@ class BridgePosition:
         self.current_high_player = None
         self.score = 0 # Number of tricks won by players 0 and 2
         self.move_to_str = move_to_str
+        self.move_to_int = move_to_int
 
     def get_moves(self):
         if self.cards_in_trick == 0 or self.hands[self.current_player][self.current_suit] == []: suits = range(4)
