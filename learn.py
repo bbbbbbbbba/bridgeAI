@@ -69,5 +69,24 @@ for k in range(10):
     t0 = time.process_time()
     metrics = classifier.evaluate(input_fn = test_input_fn)
     print("Test time:", time.process_time() - t0)
+
+    t0 = time.process_time()
+    for i in range(train_num, train_num + 52):
+        pos = BridgePosition.from_tensor(data[0][i])
+        policy, value = data[1][i][0], data[2][i][0]
+        pos.visualize(verbose = True)
+        print(pos.move_to_str(pos.int_to_move(policy)), value)
+        pred = classifier.predict(input_fn = tf.estimator.inputs.numpy_input_fn(
+            x = {'x': data[0][i:i+1]}, y = None,
+            num_epochs = 1, shuffle = False, batch_size = 1)
+        )
+        t1 = time.process_time()
+        pred = next(pred)
+        print("Time:", time.process_time() - t1)
+        pred_policy, pred_value = pred['class_ids'][0], pred['val'][0]
+        print(pos.move_to_str(pos.int_to_move(pred_policy)), pred_value)
+        print()
+    print("Prediction time:", time.process_time() - t0)
+
     accuracy_score, mse_value = metrics['accuracy'], metrics['mse_value']
     print(accuracy_score, mse_value)
