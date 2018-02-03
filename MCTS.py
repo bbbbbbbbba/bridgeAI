@@ -44,8 +44,7 @@ def evaluate(pos, moves):
     # TODO
     # should always output estimated score for players 0 and 2,
     # even though DNN always see the situation from the perspective of the current player
-    tricks_left = sum(len(x) for x in pos.hands[pos.current_player])
-    return (pos.score + tricks_left / 2, {move: 1 / len(moves) for move in moves})
+    return (pos.score + pos.tricks_left() / 2, {move: 1 / len(moves) for move in moves})
 
 def visualize_tree(root, depth = 0, move = None, parent = None):
     card_str = '**' if move is None else parent.move_to_str(move)

@@ -68,6 +68,9 @@ class BridgePosition:
         self.cards_in_trick += 1
         return False
 
+    def tricks_left(self):
+        return sum(len(x) for x in self.hands[self.current_player])
+
     def visualize(self, verbose = False):
         hand_strs = [[suit_str[suit] + ' ' + ''.join(rank_str[rank] for rank in ranks)
             for suit, ranks in enumerate(hand)] for hand in self.hands]

@@ -22,6 +22,7 @@ def self_play(visualize = False):
     data_x = []
     data_p = []
     data_v = []
+    data_v_sign = []
     if visualize: tree[0].visualize()
     while len(tree[0].get_moves()) > 0:
         for k in range(100): MCTS.MCTS_iteration(tree)
@@ -32,12 +33,14 @@ def self_play(visualize = False):
                 move_max = move
         data_x.append(tree[0].to_tensor())
         data_p.append([tree[0].move_to_int(move_max)])
-        data_v.append([-tree[0].score])
+        data_v.append([-tree[0].score - tree[0].tricks_left() / 2])
+        data_v_sign.append([1 if tree[0].current_player % 2 == 0 else -1])
         if visualize:
             card_str = tree[0].move_to_str(move_max)
             print(card_str, end = ' ' if tree[0].cards_in_trick < 3 else '\n', flush = True)
         tree = tree[-1][move_max]
-    return tree[0].score, [np.array(data_x), np.array(data_p), np.array(data_v) + tree[0].score]
+    return tree[0].score, [np.array(data_x), np.array(data_p),
+                           (np.array(data_v) + tree[0].score) * np.array(data_v_sign)]
 
 import pickle
 import os
@@ -75,7 +78,7 @@ for k in range(10):
         pos = BridgePosition.from_tensor(data[0][i])
         policy, value = data[1][i][0], data[2][i][0]
         pos.visualize(verbose = True)
-        print(pos.move_to_str(pos.int_to_move(policy)), value)
+        print(pos.move_to_str(pos.int_to_move(policy)), value + pos.tricks_left() / 2)
         pred = classifier.predict(input_fn = tf.estimator.inputs.numpy_input_fn(
             x = {'x': data[0][i:i+1]}, y = None,
             num_epochs = 1, shuffle = False, batch_size = 1)
@@ -84,7 +87,7 @@ for k in range(10):
         pred = next(pred)
         print("Time:", time.process_time() - t1)
         pred_policy, pred_value = pred['class_ids'][0], pred['val'][0]
-        print(pos.move_to_str(pos.int_to_move(pred_policy)), pred_value)
+        print(pos.move_to_str(pos.int_to_move(pred_policy)), pred_value + pos.tricks_left() / 2)
         print()
     print("Prediction time:", time.process_time() - t0)
 
