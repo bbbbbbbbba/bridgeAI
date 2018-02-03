@@ -3,6 +3,7 @@ import MCTS
 import numpy as np
 import tensorflow as tf
 import DNN
+import time
 
 feature_size = len(BridgePosition().to_tensor())
 policy_num = 52
@@ -30,8 +31,6 @@ def self_play(visualize = False):
                 n_max = node[1]
                 move_max = move
         data_x.append(tree[0].to_tensor())
-        # data_p.append([0] * policy_num)
-        # data_p[-1][tree[0].move_to_int(move_max)] = 1
         data_p.append([tree[0].move_to_int(move_max)])
         data_v.append([-tree[0].score])
         if visualize:
@@ -47,8 +46,9 @@ if os.path.exists('data.pickle'):
 else:
     data = [np.zeros((0, feature_size)), np.zeros((0, 1), dtype = int), np.zeros((0, 1))] # x, p, v
     for i in range(1000):
-        print(i)
+        t0 = time.process_time()
         score, data_game = self_play(visualize = i % 100 == 0)
+        print("Game #%d time:" % i, time.process_time() - t0)
         for k in range(3): data[k] = np.vstack([data[k], data_game[k]])
     with open('data.pickle', 'wb') as fout: pickle.dump(data, fout)
 
@@ -63,7 +63,11 @@ test_input_fn = tf.estimator.inputs.numpy_input_fn(
     num_epochs = 1, shuffle = False)
 
 for k in range(10):
+    t0 = time.process_time()
     classifier.train(input_fn = train_input_fn, steps = 200)
+    print("Train time:", time.process_time() - t0)
+    t0 = time.process_time()
     metrics = classifier.evaluate(input_fn = test_input_fn)
+    print("Test time:", time.process_time() - t0)
     accuracy_score, mse_value = metrics['accuracy'], metrics['mse_value']
     print(accuracy_score, mse_value)
